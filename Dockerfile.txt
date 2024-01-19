@@ -1,0 +1,39 @@
+FROM node:lts-alpine
+
+LABEL "author.name"="Tuan Le"
+LABEL "author.email"="tuanlm.bk1.devopsonline23-04.2510@student.bkacad.edu.vn"
+
+ENV CLASS="SHB_DevOps" 
+ENV APP_HOST="0.0.0.0"
+ENV APP_PORT=8080
+ENV APP_ENV="dev"
+
+RUN mkdir /app
+WORKDIR /app
+RUN cat <<\EOF > /app/server.js
+import express from 'express';
+const host = process.env.APP_HOST || '0.0.0.0';
+const port = process.env.APP_PORT || 8080;
+const app = express();
+app.get('/', (req, res) => {
+  res.send('Hello world!');
+});
+app.listen(port, host, () => {
+  console.log(`http://${host}:${port}/`);
+});
+EOF
+
+RUN cat <<\EOF > /app/package.json
+{
+  "name": "lab-01",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
+EOF
+
+EXPOSE ${APP_PORT}
+
+RUN cd /app && npm install
+ENTRYPOINT ["/usr/local/bin/node", "/app/server.js"]
